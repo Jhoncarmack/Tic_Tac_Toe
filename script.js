@@ -34,19 +34,29 @@ function gameControl() {
 
    function game(row, col) {
       if (playerTurn) {
-         console.log("hyeon X 차례입니다.");
-         inGameBoard[row][col] = "X";
-
-         playerTurn = false;
+         if (row < 3 && col < 3) {
+            console.log("hyeon X 착수.");
+            inGameBoard[row][col] = "X";
+            playerTurn = false;
+         } else {
+            console.log("X 차례 범위를 다시 지정하세요 현재 턴: 'X')");
+            playerTurn = true;
+         }
       } else {
-         console.log("steve O 차례입니다.");
-         inGameBoard[row][col] = "O";
-         playerTurn = true;
+         if (row < 3 && col < 3) {
+            console.log("steve O 착수.");
+            inGameBoard[row][col] = "O";
+            playerTurn = true;
+         } else {
+            console.log("범위를 다시 지정하세요 (현재 턴: 'O')");
+            playerTurn = false;
+         }
       }
    }
 
-   return { gameControl, game };
+   return { game };
 }
+console.log(gameControl());
 
 createGameBoard.newGameBoard();
 createGameBoard.player("hyeon", "X");
@@ -55,8 +65,9 @@ callGame();
 function callGame() {
    const inGameControl = gameControl();
    inGameControl.game(0, 0);
-   inGameControl.game(0, 1);
-   inGameControl.game(0, 2);
+   inGameControl.game(0, 3);
+   inGameControl.game(3, 3);
+   inGameControl.game(1, 1);
 }
 
 /* 게임 다시 function으로 하고 좀더 고민하고 안되면 문제해결 방법 논의*/
