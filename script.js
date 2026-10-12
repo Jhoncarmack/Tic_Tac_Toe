@@ -1,9 +1,11 @@
-const createGameBoard = (() => {
+const gameBoard = (() => {
    let gamePlayer;
    let gamePlayer1 = "";
    let gamePlayer2 = "";
    const gameBoard = [];
-   let isPlayer = true;
+   let isFirstPlayerTurn = true;
+   let isMoveForbidden = false;
+   let victoryNotFound = true;
    const newGameBoard = () => {
       for (let i = 0; i < 3; i++) {
          const row = [];
@@ -12,7 +14,6 @@ const createGameBoard = (() => {
          }
          gameBoard.push(row);
       }
-      console.log(gameBoard);
    };
    const player = (name, marker) => {
       gamePlayer = name + " " + marker;
@@ -25,57 +26,254 @@ const createGameBoard = (() => {
       }
    };
 
-   return { gameBoard, newGameBoard, player, isPlayer };
+   return {
+      gameBoard,
+      newGameBoard,
+      player,
+      isFirstPlayerTurn,
+      isMoveForbidden,
+      victoryNotFound,
+   };
 })();
 
 function gameControl() {
-   const inGameBoard = createGameBoard.gameBoard;
-   let playerTurn = createGameBoard.isPlayer;
+   let inGameBoard = gameBoard.gameBoard;
+   let firstPlayerTurn = gameBoard.isFirstPlayerTurn;
+   let isMoveForbidden = gameBoard.isMoveForbidden;
+   let victoryNotFound = gameBoard.victoryNotFound;
 
+   let successfulMoveCount = 0;
+
+   const incrementMoveCount = () => {
+      successfulMoveCount++;
+      console.log(successfulMoveCount);
+   };
+   function checkDraw() {
+      if (successfulMoveCount === 9) {
+         console.log("무승부");
+         console.log("게임끝 재시작 해주세요");
+         console.log(inGameBoard);
+         isMoveForbidden = true;
+      }
+   }
    function game(row, col) {
-      if (playerTurn) {
+      if (firstPlayerTurn) {
          if (row < 3 && col < 3) {
-            console.log("hyeon X 착수.");
-            inGameBoard[row][col] = "X";
-            playerTurn = false;
-         } else {
+            if (isDuplication() === true) {
+               console.log("중복");
+               return;
+            }
+            if (!isMoveForbidden) {
+               inGameBoard[row][col] = "X";
+               console.log("hyeon X 착수.");
+               incrementMoveCount();
+               firstPlayerTurn = false;
+            } else {
+               console.log("게임끝 재시작해주세요");
+            }
+         } else if (row >= 3 || col >= 3) {
             console.log("X 차례 범위를 다시 지정하세요 현재 턴: 'X')");
-            playerTurn = true;
+            firstPlayerTurn = true;
          }
-      } else {
+      } else if (firstPlayerTurn === false) {
          if (row < 3 && col < 3) {
-            console.log("steve O 착수.");
-            inGameBoard[row][col] = "O";
-            playerTurn = true;
-         } else {
+            if (isDuplication() === true) {
+               console.log("중복");
+               return;
+            }
+            if (!isMoveForbidden) {
+               inGameBoard[row][col] = "O";
+               console.log("steve O 착수.");
+               incrementMoveCount();
+               firstPlayerTurn = true;
+            } else {
+               console.log("게임끝 재시작해주세요");
+            }
+         } else if (row >= 3 || col >= 3) {
             console.log("범위를 다시 지정하세요 (현재 턴: 'O')");
-            playerTurn = false;
+            firstPlayerTurn = false;
+         }
+      }
+
+      function blockPlacing() {
+         isMoveForbidden = true;
+      }
+
+      function isDuplication() {
+         if (inGameBoard[row][col] === "X" || inGameBoard[row][col] === "O") {
+            return true;
+         }
+      }
+
+      return { firstPlayerTurn, blockPlacing };
+   }
+
+   function restart() {
+      for (let i = 0; i < 3; i++) {
+         for (let j = 0; j < 3; j++) {
+            inGameBoard[i][j] = 0;
+         }
+      }
+      successfulMoveCount = 0;
+
+      isMoveForbidden = false;
+      firstPlayerTurn = true;
+      victoryNotFound = true;
+      return { victoryNotFound };
+   }
+
+   return {
+      gameControl,
+      game,
+      restart,
+      victoryNotFound,
+
+      checkDraw,
+   };
+}
+
+gameBoard.newGameBoard();
+gameBoard.player("hyeon", "X");
+gameBoard.player("steve", "O");
+callGame();
+
+function callGame() {
+   const callBoard = gameBoard.gameBoard;
+   const inGameControl = gameControl();
+
+   let playerInControl = inGameControl.restart();
+
+   const restartGame = inGameControl.restart;
+
+   const moveBlock = inGameControl.game();
+   const playerCheckDraw = inGameControl.checkDraw;
+
+   inGameControl.game(0, 0);
+   declareVictory();
+   checkVictory();
+
+   inGameControl.game(0, 1);
+   declareVictory();
+   checkVictory();
+
+   inGameControl.game(0, 2);
+   declareVictory();
+   checkVictory();
+
+   inGameControl.game(1, 1);
+   declareVictory();
+   checkVictory();
+
+   inGameControl.game(1, 0);
+   declareVictory();
+   checkVictory();
+
+   inGameControl.game(1, 2);
+   declareVictory();
+   checkVictory();
+
+   inGameControl.game(2, 1);
+   declareVictory();
+   checkVictory();
+
+   inGameControl.game(2, 0);
+   declareVictory();
+   checkVictory();
+
+   inGameControl.game(2, 2);
+   declareVictory();
+   checkVictory();
+
+   function checkVictory() {
+      if (playerInControl.victoryNotFound === false) {
+         moveBlock.blockPlacing();
+      } else if (playerInControl.victoryNotFound === true) {
+         playerCheckDraw();
+      }
+   }
+   function declareVictory() {
+      for (let i = 0; i < 3; i++) {
+         if (
+            callBoard[i][0] == "X" &&
+            callBoard[i][1] == "X" &&
+            callBoard[i][2] == "X"
+         ) {
+            console.log("x승");
+
+            playerInControl.victoryNotFound = false;
+
+            console.log(callBoard);
+            return;
+         } else if (
+            callBoard[0][i] == "X" &&
+            callBoard[1][i] == "X" &&
+            callBoard[2][i] == "X"
+         ) {
+            console.log("x승");
+            playerInControl.victoryNotFound = false;
+            console.log(callBoard);
+            return;
+         } else if (
+            callBoard[0][0] == "X" &&
+            callBoard[1][1] == "X" &&
+            callBoard[2][2] == "X"
+         ) {
+            console.log("x승");
+            playerInControl.victoryNotFound = false;
+            console.log(callBoard);
+            return;
+         } else if (
+            callBoard[2][0] == "X" &&
+            callBoard[1][1] == "X" &&
+            callBoard[0][2] == "X"
+         ) {
+            console.log("x승");
+            playerInControl.victoryNotFound = false;
+            console.log(callBoard);
+            return;
+         }
+      }
+      for (let i = 0; i < 3; i++) {
+         if (
+            callBoard[i][0] == "O" &&
+            callBoard[i][1] == "O" &&
+            callBoard[i][2] == "O"
+         ) {
+            console.log("O승");
+            playerInControl.victoryNotFound = false;
+            console.log(callBoard);
+            return;
+         } else if (
+            callBoard[0][i] == "O" &&
+            callBoard[1][i] == "O" &&
+            callBoard[2][i] == "O"
+         ) {
+            console.log("O승");
+            playerInControl.victoryNotFound = false;
+            console.log(callBoard);
+            return;
+         } else if (
+            callBoard[0][0] == "O" &&
+            callBoard[1][1] == "O" &&
+            callBoard[2][2] == "O"
+         ) {
+            console.log("O승");
+            playerInControl.victoryNotFound = false;
+            console.log(callBoard);
+            return;
+         } else if (
+            callBoard[2][0] == "O" &&
+            callBoard[1][1] == "O" &&
+            callBoard[0][2] == "O"
+         ) {
+            console.log("O승");
+            playerInControl.victoryNotFound = false;
+            console.log(callBoard);
+            return;
          }
       }
    }
-
-   return { game };
-}
-console.log(gameControl());
-
-createGameBoard.newGameBoard();
-createGameBoard.player("hyeon", "X");
-createGameBoard.player("steve", "O");
-callGame();
-function callGame() {
-   const inGameControl = gameControl();
-   inGameControl.game(0, 0);
-   inGameControl.game(0, 3);
-   inGameControl.game(3, 3);
-   inGameControl.game(1, 1);
 }
 
-/* 게임 다시 function으로 하고 좀더 고민하고 안되면 문제해결 방법 논의*/
-//  여기서 키포인트는 1. 즉시실행함수와 팩토리함수로 인스턴스 사용하는것
-//  2. 안에서부터 집짓기 콘솔로부터 하고 DOM으로 마지막연결 메서드간 호출되며 상호작용이 되며 집안 내부구조가 잘 돌아가는지가 중요
-//  3. 전역변수는 없이 만드는것
-//  객체니까 . 점표시법가능
-// 하려다 만것 -> let active = createGameBoard.my;를 어떻게 안에서 만들어서
-//  순서마다 호출되게 할건지
-//  팩토리함수에서 또다른 함수가 참조하는 방법은 return을 한 후에 변수에 담아 참조하면됨
-//  오딘에서 참조했던것 그거 보면서 다른것들은 어떻게 참조했는지만 보면 팩토리함수 얼추 다됐다.
+//   inGame 고치면 됨
+// 객체의 프로퍼티와 지역변수는 이름이 같아도 충돌안함
