@@ -102,6 +102,7 @@ function gameControl() {
             }
             if (!isMoveForbidden) {
                inGameBoard[row][col] = "X";
+
                grids[row][col].textContent = "X";
                console.log("hyeon X 착수.");
 
@@ -153,6 +154,7 @@ function gameControl() {
       for (let i = 0; i < 3; i++) {
          for (let j = 0; j < 3; j++) {
             inGameBoard[i][j] = 0;
+            grids[i][j].textContent = "";
          }
       }
       successfulMoveCount = 0;
@@ -170,6 +172,7 @@ function gameControl() {
       victoryNotFound,
       inGameBoard,
       checkDraw,
+      grids,
    };
 }
 
@@ -182,6 +185,15 @@ callGame();
 function callGame() {
    const callBoard = gameBoard.gameBoard;
    const inGameControl = gameControl();
+   for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+         inGameControl.grids[i][j].addEventListener("click", () => {
+            inGameControl.game(i, j);
+            declareVictory();
+            checkVictory();
+         });
+      }
+   }
 
    let playerInControl = inGameControl.restart();
 
@@ -189,42 +201,6 @@ function callGame() {
 
    const moveBlock = inGameControl.game();
    const playerCheckDraw = inGameControl.checkDraw;
-
-   inGameControl.game(0, 0);
-   declareVictory();
-   checkVictory();
-
-   inGameControl.game(0, 1);
-   declareVictory();
-   checkVictory();
-
-   inGameControl.game(0, 2);
-   declareVictory();
-   checkVictory();
-
-   inGameControl.game(1, 1);
-   declareVictory();
-   checkVictory();
-
-   inGameControl.game(1, 0);
-   declareVictory();
-   checkVictory();
-
-   inGameControl.game(1, 2);
-   declareVictory();
-   checkVictory();
-
-   inGameControl.game(2, 1);
-   declareVictory();
-   checkVictory();
-
-   inGameControl.game(2, 0);
-   declareVictory();
-   checkVictory();
-
-   inGameControl.game(2, 2);
-   declareVictory();
-   checkVictory();
 
    function checkVictory() {
       if (playerInControl.victoryNotFound === false) {
