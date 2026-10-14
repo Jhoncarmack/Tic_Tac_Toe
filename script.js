@@ -1,3 +1,33 @@
+function createElement() {
+   const body = document.querySelector("body");
+   const gameBoardContainer = document.createElement("div");
+   gameBoardContainer.classList.add("gameBoardContainer");
+   body.appendChild(gameBoardContainer);
+
+   return { body, gameBoardContainer };
+}
+
+function createBoardGrid() {
+   const gameBoardContainer = createElement().gameBoardContainer;
+
+   const grids = [];
+   for (let i = 0; i < 3; i++) {
+      const row = [];
+      for (let j = 0; j < 3; j++) {
+         const grid = document.createElement("div");
+         grid.style.width = `calc(100% / 3)`;
+         grid.style.height = `calc(100% / 3)`;
+         grid.classList.add(`cell-${i}-${j}`);
+         gameBoardContainer.appendChild(grid);
+
+         row.push(grid);
+      }
+      grids.push(row);
+   }
+
+   return { grids };
+}
+
 const gameBoard = (() => {
    let gamePlayer;
    let gamePlayer1 = "";
@@ -6,6 +36,7 @@ const gameBoard = (() => {
    let isFirstPlayerTurn = true;
    let isMoveForbidden = false;
    let victoryNotFound = true;
+
    const newGameBoard = () => {
       for (let i = 0; i < 3; i++) {
          const row = [];
@@ -15,6 +46,7 @@ const gameBoard = (() => {
          gameBoard.push(row);
       }
    };
+
    const player = (name, marker) => {
       gamePlayer = name + " " + marker;
       if (gamePlayer1 === "") {
@@ -44,6 +76,8 @@ function gameControl() {
 
    let successfulMoveCount = 0;
 
+   const grids = createBoardGrid().grids;
+
    const incrementMoveCount = () => {
       successfulMoveCount++;
       console.log(successfulMoveCount);
@@ -51,11 +85,14 @@ function gameControl() {
    function checkDraw() {
       if (successfulMoveCount === 9) {
          console.log("무승부");
+
          console.log("게임끝 재시작 해주세요");
          console.log(inGameBoard);
+
          isMoveForbidden = true;
       }
    }
+
    function game(row, col) {
       if (firstPlayerTurn) {
          if (row < 3 && col < 3) {
@@ -65,8 +102,11 @@ function gameControl() {
             }
             if (!isMoveForbidden) {
                inGameBoard[row][col] = "X";
+               grids[row][col].textContent = "X";
                console.log("hyeon X 착수.");
+
                incrementMoveCount();
+
                firstPlayerTurn = false;
             } else {
                console.log("게임끝 재시작해주세요");
@@ -83,6 +123,7 @@ function gameControl() {
             }
             if (!isMoveForbidden) {
                inGameBoard[row][col] = "O";
+               grids[row][col].textContent = "O";
                console.log("steve O 착수.");
                incrementMoveCount();
                firstPlayerTurn = true;
@@ -127,7 +168,7 @@ function gameControl() {
       game,
       restart,
       victoryNotFound,
-
+      inGameBoard,
       checkDraw,
    };
 }
@@ -135,6 +176,7 @@ function gameControl() {
 gameBoard.newGameBoard();
 gameBoard.player("hyeon", "X");
 gameBoard.player("steve", "O");
+
 callGame();
 
 function callGame() {
@@ -191,6 +233,7 @@ function callGame() {
          playerCheckDraw();
       }
    }
+
    function declareVictory() {
       for (let i = 0; i < 3; i++) {
          if (
@@ -274,6 +317,3 @@ function callGame() {
       }
    }
 }
-
-//   inGame 고치면 됨
-// 객체의 프로퍼티와 지역변수는 이름이 같아도 충돌안함
