@@ -80,6 +80,8 @@ body {
    display: flex;
    justify-content: center;
    align-items: center;
+   flex-direction: column;
+   gap: 10px;
 }
 .gameBoardContainer {
    height: 70vh;
@@ -93,7 +95,9 @@ body {
    justify-content: center;
    align-items: center;
    font-size: 3rem;
-}
-div {
    border: 1px solid black;
+}
+.game-status {
+   display: flex;
+   width: 40vw;
 }
