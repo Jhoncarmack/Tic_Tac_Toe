@@ -1,14 +1,23 @@
 function createElement() {
    const body = document.querySelector("body");
    const gameBoardContainer = document.createElement("div");
+   const gameStatus = document.createElement("div");
+   const btn = document.createElement("button");
+   gameStatus.classList.add("game-status");
+   btn.classList.add("restart-btn");
+   btn.textContent = "재시작";
    gameBoardContainer.classList.add("gameBoardContainer");
+   body.appendChild(gameStatus);
+   gameStatus.appendChild(btn);
+
    body.appendChild(gameBoardContainer);
 
-   return { body, gameBoardContainer };
+   return { body, gameBoardContainer, btn };
 }
 
 function createBoardGrid() {
-   const gameBoardContainer = createElement().gameBoardContainer;
+   const boardElement = createElement();
+   const gameBoardContainer = boardElement.gameBoardContainer;
 
    const grids = [];
    for (let i = 0; i < 3; i++) {
@@ -25,9 +34,14 @@ function createBoardGrid() {
       grids.push(row);
    }
 
-   return { grids };
+   return { grids, gameBoardContainer, boardElement };
 }
-
+function restartBoard(boardElement, restartGame) {
+   boardElement.btn.addEventListener("click", () => {
+      restartGame();
+   });
+   return { restartBoard };
+}
 const gameBoard = (() => {
    let gamePlayer;
    let gamePlayer1 = "";
@@ -76,7 +90,9 @@ function gameControl() {
 
    let successfulMoveCount = 0;
 
-   const grids = createBoardGrid().grids;
+   const boardData = createBoardGrid();
+   const grids = boardData.grids;
+
 
    const incrementMoveCount = () => {
       successfulMoveCount++;
@@ -157,6 +173,7 @@ function gameControl() {
             grids[i][j].textContent = "";
          }
       }
+
       successfulMoveCount = 0;
 
       isMoveForbidden = false;
@@ -173,6 +190,7 @@ function gameControl() {
       inGameBoard,
       checkDraw,
       grids,
+      boardData,
    };
 }
 
@@ -180,27 +198,30 @@ gameBoard.newGameBoard();
 gameBoard.player("hyeon", "X");
 gameBoard.player("steve", "O");
 
-callGame();
-
-function callGame() {
+(function callGame() {
    const callBoard = gameBoard.gameBoard;
    const inGameControl = gameControl();
-   for (let i = 0; i < 3; i++) {
-      for (let j = 0; j < 3; j++) {
-         inGameControl.grids[i][j].addEventListener("click", () => {
-            inGameControl.game(i, j);
-            declareVictory();
-            checkVictory();
-         });
-      }
-   }
+   const boardData = inGameControl.boardData;
+   const boardElement = boardData.boardElement;
 
    let playerInControl = inGameControl.restart();
 
    const restartGame = inGameControl.restart;
-
+   restartBoard(boardElement, restartGame);
    const moveBlock = inGameControl.game();
    const playerCheckDraw = inGameControl.checkDraw;
+
+   (function playStone() {
+      for (let i = 0; i < 3; i++) {
+         for (let j = 0; j < 3; j++) {
+            inGameControl.grids[i][j].addEventListener("click", () => {
+               inGameControl.game(i, j);
+               declareVictory();
+               checkVictory();
+            });
+         }
+      }
+   })();
 
    function checkVictory() {
       if (playerInControl.victoryNotFound === false) {
@@ -292,4 +313,4 @@ function callGame() {
          }
       }
    }
-}
+})();
