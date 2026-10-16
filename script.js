@@ -5,14 +5,20 @@ function createElement() {
    const btn = document.createElement("button");
    const gameMessage = document.createElement("div");
    const playerStatus = document.createElement("div");
+   const title = document.createElement("div");
+
+   title.classList.add("title");
+   title.textContent = "TIC Tac TOE";
    playerStatus.classList.add("player-status");
    gameStatus.classList.add("game-status");
    btn.classList.add("restart-btn");
    btn.textContent = "재시작";
 
    gameBoardContainer.classList.add("gameBoardContainer");
+   body.appendChild(title);
    body.appendChild(playerStatus);
    body.appendChild(gameStatus);
+
    gameStatus.appendChild(btn);
    gameStatus.appendChild(gameMessage);
 
@@ -142,16 +148,16 @@ function gameControl() {
                inGameBoard[row][col] = "X";
 
                grids[row][col].textContent = "X";
-               console.log("hyeon X 착수.");
-               console.log(isMoveForbidden);
-               showPlayerStatus.textContent = "hyeon X 착수";
+               console.log("player1 X 착수.");
+
+               showPlayerStatus.textContent = "player1 X 착수";
 
                incrementMoveCount();
 
                firstPlayerTurn = false;
             } else {
                console.log("게임끝 재시작해주세요");
-               console.log(isMoveForbidden);
+
                showPlayerStatus.textContent = "게임끝 재시작 해주세요";
             }
          } else if (row >= 3 || col >= 3) {
@@ -168,8 +174,8 @@ function gameControl() {
                }
                inGameBoard[row][col] = "O";
                grids[row][col].textContent = "O";
-               console.log("steve O 착수.");
-               showPlayerStatus.textContent = "steve O 착수";
+               console.log("player2 O 착수.");
+               showPlayerStatus.textContent = "player2 O 착수";
 
                incrementMoveCount();
                firstPlayerTurn = true;
@@ -228,8 +234,8 @@ function gameControl() {
 }
 
 gameBoard.newGameBoard();
-gameBoard.player("hyeon", "X");
-gameBoard.player("steve", "O");
+gameBoard.player("player1", "X");
+gameBoard.player("player2", "O");
 
 (function callGame() {
    const callBoard = gameBoard.gameBoard;
