@@ -42,9 +42,17 @@ function createBoardGrid() {
 
    return { grids, gameBoardContainer, boardElement };
 }
-function restartBoard(boardElement, restartGame, playerInControl) {
+function restartBoard(
+   boardElement,
+   restartGame,
+   playerInControl,
+   showGameMessage,
+   showPlayerStatus,
+) {
    boardElement.btn.addEventListener("click", () => {
       playerInControl.victoryNotFound = true;
+      showGameMessage.textContent = "";
+      showPlayerStatus.textContent = "";
       restartGame();
    });
    return { restartBoard };
@@ -230,11 +238,18 @@ gameBoard.player("steve", "O");
    const boardElement = boardData.boardElement;
 
    const showGameMessage = inGameControl.showGameMessage;
+   const showPlayerStatus = inGameControl.showPlayerStatus;
    let playerInControl = inGameControl.restart();
 
    const restartGame = inGameControl.restart;
 
-   restartBoard(boardElement, restartGame, playerInControl);
+   restartBoard(
+      boardElement,
+      restartGame,
+      playerInControl,
+      showGameMessage,
+      showPlayerStatus,
+   );
    const moveBlock = inGameControl.game();
    const playerCheckDraw = inGameControl.checkDraw;
 
