@@ -96,8 +96,27 @@ body {
    align-items: center;
    font-size: 3rem;
    border: 1px solid black;
+   font-family: "Shadows Into Light", cursive;
+   font-weight: 400;
+   font-style: normal;
 }
 .game-status {
    display: flex;
    width: 40vw;
+   align-items: center;
+   gap: 10px;
+
+   font-family: "Bungee", sans-serif;
+   font-style: normal;
+   font-weight: 600;
+}
+.player-status {
+   font-family: "Bungee", sans-serif;
+   font-weight: 400;
+   font-style: normal;
+}
+.title {
+   font-family: "Bungee", sans-serif;
+   font-style: normal;
+   color: rgb(75, 75, 165);
 }
