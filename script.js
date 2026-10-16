@@ -3,16 +3,22 @@ function createElement() {
    const gameBoardContainer = document.createElement("div");
    const gameStatus = document.createElement("div");
    const btn = document.createElement("button");
+   const gameMessage = document.createElement("div");
+   const playerStatus = document.createElement("div");
+   playerStatus.classList.add("player-status");
    gameStatus.classList.add("game-status");
    btn.classList.add("restart-btn");
    btn.textContent = "재시작";
+
    gameBoardContainer.classList.add("gameBoardContainer");
+   body.appendChild(playerStatus);
    body.appendChild(gameStatus);
    gameStatus.appendChild(btn);
+   gameStatus.appendChild(gameMessage);
 
    body.appendChild(gameBoardContainer);
 
-   return { body, gameBoardContainer, btn };
+   return { body, gameBoardContainer, btn, gameMessage, playerStatus };
 }
 
 function createBoardGrid() {
@@ -36,8 +42,9 @@ function createBoardGrid() {
 
    return { grids, gameBoardContainer, boardElement };
 }
-function restartBoard(boardElement, restartGame) {
+function restartBoard(boardElement, restartGame, playerInControl) {
    boardElement.btn.addEventListener("click", () => {
+      playerInControl.victoryNotFound = true;
       restartGame();
    });
    return { restartBoard };
@@ -93,6 +100,10 @@ function gameControl() {
    const boardData = createBoardGrid();
    const grids = boardData.grids;
 
+   const gameMessage = boardData.boardElement;
+   const showGameMessage = gameMessage.gameMessage;
+   const playerStatus = boardData.boardElement;
+   const showPlayerStatus = playerStatus.playerStatus;
 
    const incrementMoveCount = () => {
       successfulMoveCount++;
@@ -105,6 +116,8 @@ function gameControl() {
          console.log("게임끝 재시작 해주세요");
          console.log(inGameBoard);
 
+         showGameMessage.textContent = "무승부!";
+         showPlayerStatus.textContent = "게임끝 재시작 해주세요";
          isMoveForbidden = true;
       }
    }
@@ -112,21 +125,26 @@ function gameControl() {
    function game(row, col) {
       if (firstPlayerTurn) {
          if (row < 3 && col < 3) {
-            if (isDuplication() === true) {
-               console.log("중복");
-               return;
-            }
             if (!isMoveForbidden) {
+               if (isDuplication() === true) {
+                  console.log("중복");
+                  showPlayerStatus.textContent = "중복";
+                  return;
+               }
                inGameBoard[row][col] = "X";
 
                grids[row][col].textContent = "X";
                console.log("hyeon X 착수.");
+               console.log(isMoveForbidden);
+               showPlayerStatus.textContent = "hyeon X 착수";
 
                incrementMoveCount();
 
                firstPlayerTurn = false;
             } else {
                console.log("게임끝 재시작해주세요");
+               console.log(isMoveForbidden);
+               showPlayerStatus.textContent = "게임끝 재시작 해주세요";
             }
          } else if (row >= 3 || col >= 3) {
             console.log("X 차례 범위를 다시 지정하세요 현재 턴: 'X')");
@@ -134,18 +152,23 @@ function gameControl() {
          }
       } else if (firstPlayerTurn === false) {
          if (row < 3 && col < 3) {
-            if (isDuplication() === true) {
-               console.log("중복");
-               return;
-            }
             if (!isMoveForbidden) {
+               if (isDuplication() === true) {
+                  console.log("중복");
+                  showPlayerStatus.textContent = "중복";
+                  return;
+               }
                inGameBoard[row][col] = "O";
                grids[row][col].textContent = "O";
                console.log("steve O 착수.");
+               showPlayerStatus.textContent = "steve O 착수";
+
                incrementMoveCount();
                firstPlayerTurn = true;
             } else {
                console.log("게임끝 재시작해주세요");
+               console.log(isMoveForbidden);
+               showPlayerStatus.textContent = "게임끝 재시작 해주세요";
             }
          } else if (row >= 3 || col >= 3) {
             console.log("범위를 다시 지정하세요 (현재 턴: 'O')");
@@ -191,6 +214,8 @@ function gameControl() {
       checkDraw,
       grids,
       boardData,
+      showPlayerStatus,
+      showGameMessage,
    };
 }
 
@@ -204,10 +229,12 @@ gameBoard.player("steve", "O");
    const boardData = inGameControl.boardData;
    const boardElement = boardData.boardElement;
 
+   const showGameMessage = inGameControl.showGameMessage;
    let playerInControl = inGameControl.restart();
 
    const restartGame = inGameControl.restart;
-   restartBoard(boardElement, restartGame);
+
+   restartBoard(boardElement, restartGame, playerInControl);
    const moveBlock = inGameControl.game();
    const playerCheckDraw = inGameControl.checkDraw;
 
@@ -216,6 +243,7 @@ gameBoard.player("steve", "O");
          for (let j = 0; j < 3; j++) {
             inGameControl.grids[i][j].addEventListener("click", () => {
                inGameControl.game(i, j);
+
                declareVictory();
                checkVictory();
             });
@@ -239,7 +267,7 @@ gameBoard.player("steve", "O");
             callBoard[i][2] == "X"
          ) {
             console.log("x승");
-
+            showGameMessage.textContent = "x 승리!";
             playerInControl.victoryNotFound = false;
 
             console.log(callBoard);
@@ -250,6 +278,7 @@ gameBoard.player("steve", "O");
             callBoard[2][i] == "X"
          ) {
             console.log("x승");
+            showGameMessage.textContent = "x 승리!";
             playerInControl.victoryNotFound = false;
             console.log(callBoard);
             return;
@@ -259,6 +288,7 @@ gameBoard.player("steve", "O");
             callBoard[2][2] == "X"
          ) {
             console.log("x승");
+            showGameMessage.textContent = "x 승리!";
             playerInControl.victoryNotFound = false;
             console.log(callBoard);
             return;
@@ -268,6 +298,7 @@ gameBoard.player("steve", "O");
             callBoard[0][2] == "X"
          ) {
             console.log("x승");
+            showGameMessage.textContent = "x 승리!";
             playerInControl.victoryNotFound = false;
             console.log(callBoard);
             return;
@@ -280,6 +311,7 @@ gameBoard.player("steve", "O");
             callBoard[i][2] == "O"
          ) {
             console.log("O승");
+            showGameMessage.textContent = "O 승리!";
             playerInControl.victoryNotFound = false;
             console.log(callBoard);
             return;
@@ -289,6 +321,7 @@ gameBoard.player("steve", "O");
             callBoard[2][i] == "O"
          ) {
             console.log("O승");
+            showGameMessage.textContent = "O 승리!";
             playerInControl.victoryNotFound = false;
             console.log(callBoard);
             return;
@@ -298,6 +331,7 @@ gameBoard.player("steve", "O");
             callBoard[2][2] == "O"
          ) {
             console.log("O승");
+            showGameMessage.textContent = "O 승리!";
             playerInControl.victoryNotFound = false;
             console.log(callBoard);
             return;
@@ -307,6 +341,7 @@ gameBoard.player("steve", "O");
             callBoard[0][2] == "O"
          ) {
             console.log("O승");
+            showGameMessage.textContent = "O 승리!";
             playerInControl.victoryNotFound = false;
             console.log(callBoard);
             return;
