@@ -10,15 +10,9 @@
 
 ## 데모 (Live Demo)
 
-배포 주소 추가 예정입니다.
-
-<!-- 배포한 뒤 아래 형식으로 실제 주소를 추가하세요.
-[사이트 바로 가기](실제_배포_주소)
--->
+[사이트 바로 가기](https://jhoncarmack.github.io/Tic_Tac_Toe/)
 
 ## 스크린샷
-
-게임 화면 스크린샷 추가 예정입니다.
 
 <p align="center">
   <img src="./resultOne.png" width="43%" alt="틱택토 게임 화면 1">
